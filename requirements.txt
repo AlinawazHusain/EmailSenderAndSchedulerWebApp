@@ -1,0 +1,6 @@
+flask
+requests
+pandas
+groq
+gspread
+oauth2client

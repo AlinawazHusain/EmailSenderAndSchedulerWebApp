@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Events Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Email Events in the Last 2 Days</h1>
+
+        {% if message %}
+            <p class="message">{{ message }}</p>
+        {% else %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Timestamp</th>
+                        <th>Recipient</th>
+                        <th>Sender</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.event }}</td>
+                        <td>{{ event.timestamp }}</td>
+                        <td>{{ event.recipient }}</td>
+                        <td>{{ event.message.headers.from}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="csv-download">
+                <h2>Download CSV</h2>
+                <a href="data:text/csv;charset=utf-8,{{ csv_data | urlencode }}" download="email_events.csv" class="download-link">
+                    Click to download CSV
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

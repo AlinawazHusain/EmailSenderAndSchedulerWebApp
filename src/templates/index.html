@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mass Email Sender</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index_style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Mass Email Sender</h1>
+        
+        <form id="email-form" method="POST" enctype="multipart/form-data">
+            
+            <label for="SenderName">Your Name:</label><br>
+            <textarea id="SenderName" name="SenderName" rows="1" cols="50"></textarea><br><br>
+
+            <label for="SenderPosition">Your Position:</label><br>
+            <textarea id="SenderPosition" name="SenderPosition" rows="1" cols="50"></textarea><br><br>
+
+            <label for="SenderEmail">Email for Sending Mails:</label><br>
+            <textarea id="SenderEmail" name="SenderEmail" rows="1" cols="50"></textarea><br><br>
+
+            <label for="ScheduleOrSend">Want to Send Instantly or Schedule:</label><br><br>
+            <label class="radio-container">
+                <input type="radio" name="ScheduleOrSend" value="sendIntantly" required>
+                <span class="checkmark"></span> Send Instantly
+            </label><br><br>
+            
+            <label class="radio-container">
+                <input type="radio" name="ScheduleOrSend" value="Schedule" required>
+                <span class="checkmark"></span> Schedule
+            </label><br><br>
+
+            <label for="Delay">Delay in between each Scheduled Emails if you want to Schedule:</label><br>
+            <input type="number" name="Delay" id="Delay"><br><br>
+
+            <label for="SenderCompany">Your Company/Organisation Name:</label><br>
+            <textarea id="SenderCompany" name="SenderCompany" rows="1" cols="50"></textarea><br><br>
+            
+            <label for="DataFile">Provide Data in CSV or XLSX format:</label><br>
+            <input id="DataFile" name="DataFile" type="file" accept=".csv, .xlsx"><br><br>
+
+            <label for="prompt">Enter your prompt:</label><br>
+            <textarea id="prompt" name="prompt" rows="4" cols="50"></textarea><br><br>
+            
+            <input type="submit" value="Submit">
+        </form>
+
+        <h2>Counts</h2>
+        <div id="counts">
+            <p>Status: <span id="status">Idol</span></p>
+            <p>Sended mail count: <span id="count1">0</span></p>
+            <p>Failed email count: <span id="count2">0</span></p>
+            <p>Scheduled email count: <span id="count3">0</span></p>
+        </div>
+
+        <!-- Button to Go to Dashboard -->
+        <div class="dashboard-btn">
+            <a href="{{ url_for('dashboard') }}">
+                <button type="button">Go to Dashboard</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission with AJAX
+        $('#email-form').on('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            var formData = new FormData(this); // Get form data including files
+
+            $.ajax({
+                url: '{{ url_for("submit") }}',  // Send data to the Flask route '/Submit'
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    // Update the response area with the server's response
+                    alert(response.response);  // Show the response message (you can update this section as needed)
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors
+                    alert('An error occurred: ' + error);
+                }
+            });
+        });
+
+        // Function to periodically fetch and update the counts
+        function updateCounts() {
+            $.get('/get_counts', function(data) {
+                // Update the counts dynamically
+                $('#status').text(data.counts.status);
+                $('#count1').text(data.counts.count1);
+                $('#count2').text(data.counts.count2);
+                $('#count3').text(data.counts.count3);
+            });
+        }
+
+        // Update the counts every 5 seconds
+        setInterval(updateCounts, 5000); // Fetch counts every 5 seconds
+
+        // Initial count fetch
+        updateCounts();
+    </script>
+</body>
+</html>
